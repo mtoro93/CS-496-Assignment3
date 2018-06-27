@@ -1,0 +1,2544 @@
+{
+	"info": {
+		"name": "CS 496 Assignment 3",
+		"_postman_id": "374d8cf3-b419-5d81-5b4c-fc062a34a70a",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "test boat post part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d283db05-cad2-4749-82c4-3fea550b382f",
+						"type": "text/javascript",
+						"exec": [
+							"// check for 201 status code",
+							"// grab ID",
+							"// check in a get that list incremented",
+							"// double check body contents via the ID",
+							"pm.test(\"Successful POST request (returns 201 status code)\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"boat_id\", jsonData.id);",
+							"});",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "25055d33-7319-4a08-b435-e07c0604d897",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest(\"http://silicon-perigee-191721.appspot.com/boat\", function (err, response) {",
+							"    console.log(response.json());",
+							"    pm.environment.set(\"priorBoats\", Number(Object.keys(response.json()).length));",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test_boat\",\n\t\"type\": \"sail boat\",\n\t\"length\": 2\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat post part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "beaf7c4a-606b-4c66-b625-12a6f9423579",
+						"type": "text/javascript",
+						"exec": [
+							"// validate the request here",
+							"// then in a separate test, test the api's validation",
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Request data validated\", function(){",
+							"    pm.expect(jsonData.hasOwnProperty('name')).to.eql(true);",
+							"    pm.expect(jsonData.hasOwnProperty('type')).to.eql(true);",
+							"    pm.expect(jsonData.hasOwnProperty('length')).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Boat data validated\", function(){",
+							"    pm.expect(jsonData.id).to.be.eql(pm.environment.get(\"boat_id\"));",
+							"    pm.expect(jsonData.name).to.be.eql(\"test_boat\");",
+							"    pm.expect(jsonData.type).to.be.eql(\"sail boat\");",
+							"    pm.expect(jsonData.length).to.be.eql(2);",
+							"    pm.expect(jsonData.at_sea).to.be.eql(true);",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat post part 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8d2cbc3f-c9da-4a83-86c9-d280c9003846",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Boat list incremented by one\", function(){",
+							"    pm.expect(Object.keys(pm.response.json()).length).",
+							"        to.eql(Number(pm.environment.get(\"priorBoats\")) + 1); ",
+							"});",
+							"",
+							"pm.test(\"Validate boat id is in boat list\", function()",
+							"{",
+							"    var i;",
+							"    var jsonData = pm.response.json();",
+							"    var found = false;",
+							"    for (i = 0; i < Object.keys(jsonData).length; i++)",
+							"    {",
+							"        if (jsonData[i].id == pm.environment.get(\"boat_id\"))",
+							"            found = true;",
+							"    }",
+							"    ",
+							"    pm.expect(found).to.eql(true);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat post Invalid Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "50dd2f34-2519-43b6-ba01-88774c45fefb",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Test invalid request\", function(){",
+							"    pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test_boat\",\n\t\"type\": \"sail boat\",\n\t\"lengt\": 2\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat post Invalid Data part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "92053c66-4ee6-48b0-b8e3-bafd81b7a037",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Test invalid data: length\", function(){",
+							"    pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test_boat\",\n\t\"type\": \"sail boat\",\n\t\"length\": \"invalid\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat post Invalid Data part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b0b52d04-02bc-4786-b1f7-9f5339131ed9",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Test invalid data: type\", function(){",
+							"    pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test_boat\",\n\t\"type\": 2,\n\t\"length\": 2\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat post Invalid Data part 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0f46595b-c3ec-4c19-955e-d43efab624fd",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Test invalid data: name\", function(){",
+							"    pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": 2,\n\t\"type\": \"sail boat\",\n\t\"length\": 2\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test get all boats",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c6c03380-55d8-4834-91b7-c24e8d6292bd",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Returns status code 200\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"All Boats accounted for\", function(){",
+							"    pm.expect(Object.keys(pm.response.json()).length).",
+							"        to.eql(Number(pm.environment.get(\"priorBoats\")) + 1); ",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test get one boat",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3132ac62-087c-4684-b35d-3f9a7d61636b",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code 200 returned\", function(){",
+							"   pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Boat data validated\", function(){",
+							"    pm.expect(jsonData.id).to.be.eql(pm.environment.get(\"boat_id\"));",
+							"    pm.expect(jsonData.name).to.be.eql(\"test_boat\");",
+							"    pm.expect(jsonData.type).to.be.eql(\"sail boat\");",
+							"    pm.expect(jsonData.length).to.be.eql(2);",
+							"    pm.expect(jsonData.at_sea).to.be.eql(true);",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat get wrong ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "62ece3c5-b58a-4a73-87cd-beba4a5cee2c",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/wrongID",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"wrongID"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat patch part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "27414b48-9483-46b0-a1d2-3bff39da3d89",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"204 status code returned\", function(){",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"edit_boat\",\n\t\"type\": \"sail_boat\",\n\t\"length\": 2\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat patch part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "12e1d11c-370c-4dd3-9a38-bb559f7780e0",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Boat edit validated\", function(){",
+							"    pm.expect(jsonData.id).to.be.eql(pm.environment.get(\"boat_id\"));",
+							"    pm.expect(jsonData.name).to.be.eql(\"edit_boat\");",
+							"    pm.expect(jsonData.type).to.be.eql(\"sail_boat\");",
+							"    pm.expect(jsonData.length).to.be.eql(2);",
+							"    pm.expect(jsonData.at_sea).to.be.eql(true);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat patch wrong ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "90ff8fdb-9579-4e37-9221-248c14fa9995",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"edit_boat\",\n\t\"type\": \"sail_boat\",\n\t\"length\": 29\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/wrongID",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"wrongID"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat patch Invalid Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1e84919f-6f89-4f6a-82c8-fe1cffb66a4a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"edit_boat\",\n\t\"type\": \"sail_boat\",\n\t\"lengh\": 29\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat patch Invalid Data part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5257cab7-35cf-4333-ab64-1a8cce68c2b7",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Invalid data: length\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"edit_boat\",\n\t\"type\": \"sail_boat\",\n\t\"length\": \"invalid\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat patch Invalid Data part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6ed5c2b0-c83a-4f5a-bd89-e95c3ac3d0ba",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Invalid data: name\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": 2,\n\t\"type\": \"sail_boat\",\n\t\"length\": 2\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat patch Invalid Data part 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4da3a0dd-3888-4553-bff0-6b4b7cb03c37",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Invalid data: type\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"edit_boat\",\n\t\"type\": 2,\n\t\"length\": 2\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip post part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "119d7fde-fd82-46b9-8caa-9e0845123d51",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"204 status code returned\", function(){",
+							"    pm.response.to.have.status(201);",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"slip_id\", jsonData.id);",
+							"});",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cc78c75f-5a45-4216-ace2-d838723a6ca0",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest(\"http://silicon-perigee-191721.appspot.com/slip\", function (err, response) {",
+							"    console.log(response.json());",
+							"    pm.environment.set(\"priorSlips\", Number(Object.keys(response.json()).length));",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 3\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip post part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b3c68e9-0ca7-41be-8ac5-827340a7c449",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Request data validated\", function(){",
+							"    pm.expect(jsonData.hasOwnProperty('number')).to.eql(true);",
+							"    //pm.expect(jsonData.hasOwnProperty('current_boat')).to.eql(true);",
+							"    //pm.expect(jsonData.hasOwnProperty('arrival_date')).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Slip data validated\", function(){",
+							"    pm.expect(jsonData.id).to.be.eql(pm.environment.get(\"slip_id\"));",
+							"    pm.expect(jsonData.number).to.be.eql(3);",
+							"    pm.expect(jsonData.current_boat).to.be.eql(null);",
+							"    pm.expect(jsonData.arrival_date).to.be.eql(null);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip post part 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "abfc1d75-2a89-4dd4-a231-29272794c1c4",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Slip list incremented by one\", function(){",
+							"    pm.expect(Object.keys(pm.response.json()).length).",
+							"        to.eql(Number(pm.environment.get(\"priorSlips\")) + 1); ",
+							"});",
+							"",
+							"pm.test(\"Validate slip id is in slip list\", function()",
+							"{",
+							"    var i;",
+							"    var jsonData = pm.response.json();",
+							"    var found = false;",
+							"    for (i = 0; i < Object.keys(jsonData).length; i++)",
+							"    {",
+							"        if (jsonData[i].id == pm.environment.get(\"slip_id\"))",
+							"            found = true;",
+							"    }",
+							"    ",
+							"    pm.expect(found).to.eql(true);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip post Invalid Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b7b58a07-1606-4806-97f7-dc87dcf8a8ff",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"numbe\": 3\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip post Invalid Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a90fbe5-099a-4a49-940c-9b8b7bd85173",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Invalid data: number\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": \"invalid\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip post Repeat Number",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8d1221fc-23a7-4eed-ba29-fb4d6de64040",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 3\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test get all slips",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "40eaa04e-f0d4-4478-b377-f823ed1044b7",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Returns status code 200\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"All Slips accounted for\", function(){",
+							"    pm.expect(Object.keys(pm.response.json()).length).",
+							"        to.eql(Number(pm.environment.get(\"priorSlips\")) + 1); ",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test get one slip",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16b794aa-03b9-417b-a5e5-a2781087cfb7",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code 200 returned\", function(){",
+							"   pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Slip data validated\", function(){",
+							"    pm.expect(jsonData.id).to.be.eql(pm.environment.get(\"slip_id\"));",
+							"    pm.expect(jsonData.number).to.be.eql(3);",
+							"    pm.expect(jsonData.current_boat).to.be.eql(null);",
+							"    pm.expect(jsonData.arrival_date).to.be.eql(null);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip get wrong ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ef5f9b6-d550-4e17-8afd-feb012fe05f3",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/wrongID",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"wrongID"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip patch part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "12512e57-a1f0-4845-926e-475baf146600",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"204 status code returned\", function(){",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 11\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip patch part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b0c81bd5-00f1-4438-9ac7-15bdfae84409",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Slip edit validated\", function(){",
+							"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"slip_id\"));",
+							"    pm.expect(jsonData.number).to.eql(11);",
+							"    pm.expect(jsonData.current_boat).to.eql(null);",
+							"    pm.expect(jsonData.arrival_date).to.eql(null);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip patch wrong ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8bd14a61-00cc-4086-be26-6def956d31fa",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/wrongID",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"wrongID"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip patch Invalid Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aedb98d0-3930-441f-b7f8-2ea71ba95bef",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"numbr\": 11\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip patch Invalid Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2abd5518-e568-4eda-b7ec-fdf1394ae89c",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Invalid data: number\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": \"invalid\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip patch Repeat Number",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ad1888b9-2f55-41af-8840-927920e42f60",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 11\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat put part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "23ab19ef-e037-44bc-a761-1854c82e0870",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"204 status code returned\", function(){",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 11,\n\t\"arrival_date\": \"2/4/2018\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat put part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cfdf630f-466c-47a5-9f12-d022a22d0369",
+						"type": "text/javascript",
+						"exec": [
+							"// validate at sea is false",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"At Sea is False\", function(){",
+							"    pm.expect(jsonData.id).to.be.eql(pm.environment.get(\"boat_id\"));",
+							"    pm.expect(jsonData.at_sea).to.be.eql(false);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat put part 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e1c9fed9-acac-41d2-9351-2a5b5e4876eb",
+						"type": "text/javascript",
+						"exec": [
+							"// validate at sea is false",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Boat is in Slip validated\", function(){",
+							"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"slip_id\"));",
+							"    console.log(\"TEST BOAT PUT\");",
+							"    console.log(jsonData.current_boat);",
+							"    pm.expect(jsonData.current_boat).to.eql('silicon-perigee-191721.appspot.com/boat/' + pm.environment.get(\"boat_id\"));",
+							"});",
+							"",
+							"pm.test(\"Arrival date validated\", function(){",
+							"   pm.expect(jsonData.arrival_date).to.be.eql(\"2/4/2018\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat put wrong ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0915c48e-0156-4b64-a51d-10fe8256b405",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 3,\n\t\"arrival_date\": \"2/4/2018\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/wrongID",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"wrongID"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat put Invalid Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d705deb6-2e4c-4618-b6bb-e2a020043d0f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"numbr\": 11,\n\t\"arrival_date\": \"2/4/2018\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat put Invalid Data part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8c9aa594-ee07-4693-b549-ff7dd541e025",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Invalid data: number\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": \"invalid\",\n\t\"arrival_date\": \"2/4/2018\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat put Invalid Data part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "000db32a-db5f-4f66-92af-e4f07024e5f1",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Invalid data: arrival_date\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 11,\n\t\"arrival_date\": 2\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat put Invalid Slip",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ead1149b-0981-48b7-81a0-f28b8162c78e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"403 status code returned\", function(){",
+							"     pm.response.to.have.status(403);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 11,\n\t\"arrival_date\": \"2/4/2018\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip put part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8eded6ff-fe42-4405-aa11-3c3a0b4490b6",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"204 status code returned\", function(){",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip put part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e757b000-c14b-44a5-b6f0-c44c319dd035",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"current_boat is null\", function(){",
+							"    var currentBoat = jsonData.current_boat;",
+							"    console.log(\"TEST SLIP PUT\");",
+							"    console.log(currentBoat);",
+							"    pm.expect(currentBoat).to.eql(null);",
+							"});",
+							"",
+							"pm.test(\"arrival_date is null\", function(){",
+							"    var arrivalDate = jsonData.arrival_date;",
+							"    console.log(arrivalDate);",
+							"    pm.expect(arrivalDate).to.eql(null);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip put part 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c47a050e-4f65-4921-aa97-14b65d1f173d",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.test(\"at_sea is set to true\", function(){",
+							"    pm.expect(jsonData.at_sea).to.eql(true);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat delete pre",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "23ab19ef-e037-44bc-a761-1854c82e0870",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"204 status code returned\", function(){",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 11,\n\t\"arrival_date\": \"2/4/2018\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat delete part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9455319c-2927-4aab-8ff0-2fb0836cf5b0",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"204 status code returned\", function(){",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat delete part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "436cd20c-c03e-469d-b5fe-0951174dcec7",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"// confirm list decremented by 1",
+							"",
+							"pm.test(\"Boat list decremented by one\", function(){",
+							"    pm.expect(Object.keys(pm.response.json()).length).",
+							"        to.eql(Number(pm.environment.get(\"priorBoats\"))); ",
+							"});",
+							"",
+							"// confirm id is not in list",
+							"",
+							"pm.test(\"Validate boat id is not in boat list\", function()",
+							"{",
+							"    var i;",
+							"    var jsonData = pm.response.json();",
+							"    for (i = 0; i < Object.keys(jsonData).length; i++)",
+							"    {",
+							"        pm.expect(jsonData[i].id).to.not.eql(pm.environment.get(\"boat_id\"));",
+							"    }",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat delete part 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f9366837-c447-4208-9872-412eb240c3f6",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"// validate slip is set to empty",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"slip is emptied from delete\", function(){",
+							"   var currentBoat = jsonData.current_boat;",
+							"   var arrivalDate = jsonData.arrival_date;",
+							"   console.log(\"TEST BOAT DELETE\");",
+							"   console.log(currentBoat);",
+							"   console.log(arrivalDate);",
+							"   pm.expect(currentBoat).to.eql(null);",
+							"   pm.expect(arrivalDate).to.eql(null);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test boat delete wrong ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3528b063-bc55-4dde-bb25-8221353fa2a7",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/wrongID",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"wrongID"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip delete pre",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7390830a-139b-43dd-94af-a673d2c2ff9c",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Successful POST request (returns 201 status code)\", function () {",
+							"    pm.response.to.have.status(201);",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"boat_id\", jsonData.id);",
+							"});",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ec2cdb41-7170-470c-9681-9d1c1dea51c9",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"test_boat\",\n\t\"type\": \"sail boat\",\n\t\"length\": 2\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip delete pre",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "23ab19ef-e037-44bc-a761-1854c82e0870",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"204 status code returned\", function(){",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"number\": 11,\n\t\"arrival_date\": \"2/4/2018\"\n}"
+				},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip delete part 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1b317844-51b3-4716-954e-fc44e0f2b210",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"204 status code returned\", function(){",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/{{slip_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"{{slip_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip delete part 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "65698121-b03f-41e9-8cac-a885805d81d6",
+						"type": "text/javascript",
+						"exec": [
+							"// check list is decremented",
+							"",
+							"pm.test(\"Slip list decremented by one\", function(){",
+							"    pm.expect(Object.keys(pm.response.json()).length).",
+							"        to.eql(Number(pm.environment.get(\"priorSlips\"))); ",
+							"});",
+							"",
+							"// confirm id is not in list",
+							"pm.test(\"Validate slip id is not in slip list\", function()",
+							"{",
+							"    var i;",
+							"    var jsonData = pm.response.json();",
+							"    for (i = 0; i < Object.keys(jsonData).length; i++)",
+							"    {",
+							"        pm.expect(jsonData[i].id).to.not.eql(pm.environment.get(\"slip_id\"));",
+							"    }",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip delete part 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "08e14789-05be-45c4-97d1-61df56952879",
+						"type": "text/javascript",
+						"exec": [
+							"// validate boat is set to at sea",
+							"var jsonData = pm.response.json();",
+							"pm.test(\"Set to 'at_sea' validated\", function(){",
+							"    pm.expect(jsonData.id).to.be.eql(pm.environment.get(\"boat_id\"));",
+							"    pm.expect(jsonData.at_sea).to.be.eql(true);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/boat/{{boat_id}}",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"boat",
+						"{{boat_id}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "test slip delete wrong ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3140280c-1f6b-453b-aec5-a9edb9149992",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"400 status code returned\", function(){",
+							"     pm.response.to.have.status(400);",
+							"});",
+							"",
+							"",
+							"",
+							"pm.environment.unset(\"boat_id\");",
+							"pm.environment.unset(\"slip_id\");",
+							"pm.environment.unset(\"priorBoats\");",
+							"pm.environment.unset(\"priorSlips\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://silicon-perigee-191721.appspot.com/slip/wrongID",
+					"protocol": "http",
+					"host": [
+						"silicon-perigee-191721",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"slip",
+						"wrongID"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
